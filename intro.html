@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #1a1d4d;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: left;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .hamburger {
+            cursor: pointer;
+            font-size: 25px;
+        }
+
+        .company-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+        }
+
+        .header-center h1 {
+            font-size: 30px;
+            font-weight: 600;
+			text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .trainee-info {
+            text-align: center;
+        }
+
+        .trainee-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .company-name {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            background-color: #0f1139;
+            width: 250px;
+            color: white;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            cursor: pointer;
+            transition: background-color 1.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+
+        .sidebar-item span {
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            padding: 50px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 5;
+        }
+
+        .content-header {
+            margin-bottom: 50px;
+        }
+
+        .content-title {
+            font-size: 50px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        /* Section Styles */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .dummy-article {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .dummy-article h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .dummy-article p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Partners and Courses List */
+        .list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .list-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .list-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .list-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .list-item h4 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .list-item p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Achievements Carousel */
+        .achievements-carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        .carousel-slides-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        .carousel-slide img {
+            width: 800px;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+			margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .carousel-slide a {
+            text-decoration: none;
+            color: #4169E1;
+            font-weight: 600;
+            font-size: 22px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .carousel-slide p {
+            font-size: 15px;
+            color: #666;
+            margin-top: 10px;
+            max-width: 500px;
+        }
+
+        /* Carousel Controls */
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .carousel-btn {
+            background-color: #1a1d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .carousel-btn:hover {
+            background-color: #4169E1;
+            transform: scale(1.05);
+        }
+
+        .carousel-btn:active {
+            transform: scale(0.95);
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #d0e8f2;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background-color: #4169E1;
+            transform: scale(1.3);
+        }
+
+        .carousel-dot:hover {
+            background-color: #5a78ff;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            width: 300px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #2c3e50;
+        }
+
+        .card-content {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .company-info {
+            font-weight: 500;
+            color: #1a1d4d;
+			text-align: center;
+            margin-bottom: 1px;
+        }
+
+        .tp-code {
+            color: #666;
+			text-align: center;
+            font-size: 9px;
+        }
+
+        .login-info {
+            list-style: none;
+        }
+
+        .login-info li {
+            margin-bottom: 1px;
+            color: #555;
+        }
+
+        .login-info strong {
+            color: #2c3e50;
+        }
+
+        /* Live Clock */
+        .clock-display {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            color: #1a1d4d;
+            border-radius: 10px;
+        }
+
+        .clock-time {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .clock-date {
+            font-size: 14px;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Trainer Carousel Styles */
+        .trainer-carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            min-height: 190px;
+            border-radius: 10px;
+        }
+
+        .carousel-slide-trainer {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            transform: translateX(100%);
+            z-index: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 0;
+        }
+
+        .carousel-slide-trainer.active {
+            opacity: 1;
+            transform: translateX(0%);
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        .carousel-slide-trainer.left {
+            transform: translateX(-100%);
+        }
+
+        .carousel-slide-trainer.right {
+            transform: translateX(100%);
+        }
+
+        .trainer-carousel img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 3px solid #e7f9fe;
+            box-shadow: 0 3px 12px 0 rgba(30,130,200,0.15);
+        }
+
+        .trainer-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 5px 0 8px;
+            letter-spacing: 0.5px;
+            color: #1a1d4d;
+			text-align: center;
+        }
+
+        .trainer-role {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 2px;
+			text-align: center;
+        }
+
+        .carousel-controls-trainer {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding: 0 20px;
+        }
+
+        .nav-arrow {
+            cursor: pointer;
+            font-size: 20px;
+            color: #1a1d4d;
+            user-select: none;
+            transition: color 1.3s ease;
+        }
+
+        .nav-arrow:hover {
+            color: #4169E1;
+        }
+
+        .dot {
+            height: 8px;
+            width: 8px;
+            margin: 0 3px;
+            background-color: #d0e8f2;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: background 1.3s ease, transform 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: #4169E1;
+            transform: scale(1.3);
+        }
+
+        .dot:hover {
+            background-color: #5a78ff;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .tiles-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .right-sidebar {
+                width: 100%;
+            }
+            
+            .tiles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .carousel-slide img {
+                width: 200px;
+                height: 200px;
+            }
+
+            .carousel-slides-container {
+                height: 350px;
+            }
+        }
+		        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .popup-content {
+            background: #fff;
+            margin: 3% auto;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 900px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .popup-image-top {
+            width: 100%;
+            height: 250px; /* MODIFIED: Reduced height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .popup-image-top img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain; /* MODIFIED: Changed from 'cover' to make image smaller & fully visible */
+        }
+
+        .popup-text-container {
+            flex: 1;
+            overflow-y: auto;
+            /* MODIFIED: Top padding moved to the header for the sticky effect */
+            padding: 0 30px 20px 30px; 
+        }
+
+        .popup-header {
+            font-size: 22px;
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            margin-top: 0;
+            /* --- MODIFIED: Added for sticky header --- */
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+            padding-top: 20px; /* Compensates for padding removed from container */
+        }
+
+        .close-btn {
+            color: #333;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            color: red;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .popup p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .popup p span {
+            font-weight: bold;
+            color: #c0392b;
+        }
+
+        h9 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .popup-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+
+            .popup-image-top {
+                height: 180px; /* MODIFIED: Reduced height for smaller screens */
+            }
+
+            .popup-header {
+                font-size: 18px;
+                padding-top: 15px; /* MODIFIED: Adjusted for smaller screens */
+            }
+
+            .popup-text-container {
+                /* MODIFIED: Adjusted padding for smaller screens */
+                padding: 0 20px 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="hamburger">☰</div>
+            <img src="https://orangecityalloys.com/images/indian_register_of_shipping.png" alt="WMS Logo" class="company-logo">
+        </div>
+        <div class="header-center">
+            <h1>Supplychain and Logistics E-Learning Portal</h1>
+        </div>
+        <div class="header-right">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPSucGCWBozg4SQ5vyPHHOnYGUUX-lgT1Lmw&s" alt="CEMS Logo" class="company-logo">
+            <div class="trainee-info">
+                <div class="trainee-name">Centre of Excellence in Maritime and Shipbuilding </div>
+                <div class="company-name">Competencies, Employability, Methodology & <br> Skills Creating Competencies of Industries 4.0</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-item active" onclick="navigateTo('about')">
+            <img src="https://cdn-icons-png.flaticon.com/512/8913/8913961.png" alt="About CEMS">
+            <span>About CEMS</span>
+            </div>
+             <div class="sidebar-item" onclick="navigateTo('partners')">
+            <img src="https://cdn-icons-png.flaticon.com/512/11113/11113678.png" alt="Placement & Projects Partners">
+            <span>Placement & Projects Partners</span>
+            </div>
+			<div class="sidebar-item" onclick="navigateTo('courses')">
+            <img src="https://cdn-icons-png.flaticon.com/512/4762/4762232.png" alt="Course Content">
+            <span>Course Content</span>
+            </div>
+		 <div class="sidebar-item" onclick="navigateTo('training')">
+            <img src="https://cdn-icons-png.flaticon.com/512/9631/9631159.png" alt="Training Modules">
+            <span>Training Modules</span>
+            </div>
+			<div class="sidebar-item" onclick="navigateTo('achievements')">
+            <img src="https://static.vecteezy.com/system/resources/thumbnails/010/826/357/small/business-icon-isolated-on-transparent-background-png.png" alt="Our Achivements">
+            <span>Our Achivements</span>
+            </div>
+           <div class="sidebar-item" onclick="navigateTo('manual')">
+                <img src="https://cdn-icons-png.flaticon.com/512/7611/7611322.png" alt="User Manual">
+                <span>User Manual</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="content-header">
+                <h2 class="content-title"> </h2>
+            </div>
+
+            <!-- About Section -->
+            <div id="about" class="section active">
+                <div class="dummy-article">
+                    <h3>About CEMS</h3>
+                    <p> We are a skill development initiative undertaken by the Ministry of Ports, Shipping & Waterways, along with Siemens Industry Software India Pvt. Ltd. and the Indian Register of Shipping (IRCLASS), in alignment with the Prime Minister's "Skill India" initiative.</p>
+					<p> The project focuses on building competencies for Industry 4.0-driven Logistics and Supply Chain Management, offering training in advanced digital technologies, automation tools, and smart logistics solutions used in the global logistics and manufacturing sectors.</p>
+					<p> CEMS serves as a comprehensive training hub dedicated to imparting high-end, industry-relevant skills across the logistics and supply chain spectrum — from warehouse management, inventory optimization, transportation planning, and port logistics, to digital supply chain transformation. Our goal is to enable learners and professionals to harness Digital Logistics and Supply Chain 4.0 concepts, enhancing efficiency, visibility, and cost optimization across value chains.</p>
+					<p> Strategically located at Mumbai and Visakhapatnam, CEMS houses 18 state-of-the-art laboratories equipped to simulate real-world logistics operations, digital twin environments, and smart manufacturing ecosystems — bridging the gap between traditional operations and next-generation digital logistics.</p>
+                </div>
+				 <div class="dummy-article">
+					<h3>Our Mission</h3>
+					<p> To promote the advancement and implementation of logistics and supply chain skills aligned with advanced digital and automation technologies, through strong industry-academia collaboration, research, and experiential learning — empowering India's workforce to meet the evolving demands of global trade and logistics.</p>
+				 </div>
+				 <div class="dummy-article">
+					<h3>Vision</h3>
+					<p>To establish CEMS as an International Centre of Excellence in Logistics and Supply Chain 4.0 for South Asia and South East Asia, attracting learners from neighboring countries.</p>
+					<p> We aim to serve as a knowledge and innovation hub, fostering leadership in integrated logistics, smart warehousing, port management, and digital supply chain ecosystems, driving maximum efficiency and sustainability in end-to-end supply chain operations. </p>
+				 </div>
+            </div>
+
+            <!-- Placement Partners Section -->
+            <div id="partners" class="section">
+                <div class="dummy-article">
+                    <h3>Placement Partners</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(1)">
+                            <img src="https://cdn4.iconfinder.com/data/icons/flat-brand-logo-2/512/amazon-512.png" alt="Amazon">
+                            <h4>Amazon</h4>
+                            <p>The world's largest online retailer.</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(2)">
+                            <img src="https://static.vecteezy.com/system/resources/previews/058/072/383/non_2x/flipkart-app-3d-icon-on-transparent-background-free-png.png" alt="Flipkart">
+                            <h4>Flipkart</h4>
+                            <p>A large Indian e-commerce company.</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(3)">
+                            <img src="https://avatars.githubusercontent.com/u/84562117?s=200&v=4" alt="Zepto">
+                            <h4>Zepto</h4>
+                            <p>Indian company that delivers groceries in 10 Minutes</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(4)">
+                            <img src="https://content3.jdmagicbox.com/comp/temp/e9/0866px866.x866.110208155557.v8e9/catalogue/-oygboh41u2.jpg" alt="Navata">
+                            <h4>Navata</h4>
+                            <p>leading Indian logistics and road transportation company</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(5)">
+                            <img src="https://play-lh.googleusercontent.com/e1Zn87SwPBW6N3LDPT40ZiZgCoKMsOx-BoMVP94P1arEHXDt8B4f16-nwa3fezZB6Go=w600-h300-pc0xffffff-pd" alt="Blinkit">
+                            <h4>Blinkit</h4>
+                            <p>Indian quick-commerce platform that delivers daily essentials in minutes.</p>
+                        </div>
+                    </div>
+                </div>
+				 <div class="dummy-article">
+                    <h3>Government Projects</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(18)">
+                            <img src="https://images.jdmagicbox.com/v2/comp/delhi/41/011p70641/catalogue/directorate-general-resettlement-rk-puram-sector-1-delhi-government-organisations-1838pe2fgk-250.jpg" alt="DGR">
+                            <h4>DGR</h4>
+                            <p>Directorate General Resettlement</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(19)">
+                            <img src="https://images.seeklogo.com/logo-png/39/1/dayal-upadhyaya-grameen-kaushal-yojana-ddu-gky-logo-png_seeklogo-390119.png" alt="DDUGKY">
+                            <h4>DDUGKY</h4>
+                            <p>Deen Dayal Upadhyaya Grameen Kaushalya Yojana</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(20)">
+                            <img src="https://www.sscnasscom.com/_next/static/media/pmkvy_banner.579b8521.jpeg" alt="PMKVY">
+                            <h4>PMKVY</h4>
+                            <p>Pradhan Mantri Kaushal Vikas Yojana</p>
+                        </div>
+						<div class="list-item" onclick="openPopup(24)">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUX6mtavCGhGoGZR1Ud-cImHMoyxPdm28-ig&s" alt="MCED">
+                            <h4>MCED</h4>
+                            <p>Maharashtra Centre for Entrepreneurship Development</p>
+                        </div>
+                    </div>
+                </div>
+				<div class="dummy-article">
+                    <h3>CSR Projects</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(21)">
+                            <img src="https://play-lh.googleusercontent.com/oiGRvVO-ZFUSqQhPbDwziTy1mjowOKxe03JIP-jRppoirxFdJ8vCOIuHru5Xzr0bNw=w600-h300-pc0xffffff-pd" alt="VPA">
+                            <h4>VPA</h4>
+                            <p>Visakhapatnam Port Authority</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(22)">
+                            <img src="https://companieslogo.com/img/orig/VEDL.NS-07320005.png?t=1729310637" alt="Vedantha">
+                            <h4>Vedantha</h4>
+                            <p>Vedantha Foundation</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(23)">
+                            <img src="https://chemicals.industry-report.net/wp-content/uploads/2019/01/toyotsu-rare-earths-india-pvt-ltd.jpg.webp" alt="TREI">
+                            <h4>TREI</h4>
+                            <p>Toyotsu Rare Earths India Private Limited.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Classification Section -->
+            <div id="courses" class="section">
+                <div class="dummy-article">
+                    <h3>Supplychain Management</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(6)">
+                            <img src="https://www.techtarget.com/rms/onlineImages/erp-supply_chain_management_mobile.png" alt="Supplychain Executive">
+                            <h4>Supplychain Executive</h4>
+                            <p> Management the end-to-end process of moving goods from raw materials to the final customer.</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(7)">
+                            <img src="https://kontrakhukum.com/media/2025/05/Persyaratan-dan-Prosedur-Pendirian-PT-untuk-E-Commerce-di-Indonesia.jpg" alt="E-Commerce & Entrepreneurship">
+                            <h4>E-Commerce & Entrepreneurship</h4>
+                            <p>The buying and selling of goods and services over the internet</p>
+                        </div>
+                    </div>
+                </div>
+				<div class="dummy-article">
+                    <h3>Warehouse Management</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(8)">
+                            <img src="https://hyphenscs.com/storage/blog_images/M371cfwmjhv1YIewfOjNXTGiCkZzYZ9fEjwwQ2vv.png" alt="Course 1">
+                            <h4>Warehouse Executive</h4>
+                            <p>Daily warehouse operations, including receiving, storing, and dispatching goods</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(9)">
+                            <img src="https://cyzerg.com/wp-content/uploads/Body-image-Warehouse-Manager-%CE%93Co-Roles-and-Responsibilities.webp" alt="Course 2">
+                            <h4>Warehouse Superviser</h4>
+                            <p>Managing warehouse staff, ensuring inventory accuracy and safety procedures.</p>
+                        </div>
+                    </div>
+                </div>
+				<div class="dummy-article">
+                    <h3>Logistics Management</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(10)">
+                            <img src="https://www.linbis.com/wp-content/uploads/2025/02/dalle-2025-02-19-15-56-15-a-high-definition-realistic-image-of-a-cargo_freight-agent-at-an-airport-cargo-terminal-the-agent-is-wearing-a-uniform-and-using-a-handheld-scanner.webp" alt="Logistics Execuitive">
+                            <h4>Logistics Execuitive</h4>
+                            <p>The storage and distribution of goods to ensure they are delivered.</p>
+                        </div>
+						<div class="list-item" onclick="openPopup(11)">
+                            <img src="https://5.imimg.com/data5/SELLER/Default/2025/5/509819855/WE/AS/KJ/2659179/consignment-agent-services-1-500x500.jpg" alt="Transportation Consolidator">
+                            <h4>Transportation Consolidator</h4>
+                            <p>combines smaller shipments from multiple shippers into a single.</p>
+                        </div>
+						<div class="list-item" onclick="openPopup(12)">
+                            <img src="https://onro.io/wp-content/uploads/2024/02/Next-day-delivery.webp" alt="Delivery Execeitive">
+                            <h4>Delivery Execuitive</h4>
+                            <p> Transports packages, documents, and goods from one location to another</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(13)">
+                            <img src="https://dom-website-prod-cdn-cms.porter.in/intercity_banner_bf6222c42d.webp" alt="Courier Operators">
+                            <h4>Courier Operators</h4>
+                            <p>the transportation of goods, from local packages to international shipments.</p>
+                        </div>
+						<div class="list-item" onclick="openPopup(14)">
+                            <img src="https://www.dhl.com/discover/adobe/dynamicmedia/deliver/dm-aid--c8218877-c027-4a62-bb38-02ad395c5f04/inline-images-800x450-2.jpg?quality=82&preferwebp=true" alt="Port Logistics">
+                            <h4>Port Logistics</h4>
+                            <p>the planning, management, and coordination of activities for moving goods through a seaport.</p>
+                        </div>
+                    </div>
+                </div>
+				<div class="dummy-article">
+                    <h3>Inventory Management</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(15)">
+                            <img src="https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/wp1lcwdav1p1/1un6n2t3qDgOFvH9xibK1f/0981ca88e6c56c756b3da76e852bd872/GettyImages-1367106352__1_.jpg?w=1500&h=680&q=60&fit=fill&f=faces&fm=jpg&fl=progressive&auto=format%2Ccompress&dpr=1&w=1000" alt="Inventory Clerk">
+                            <h4>Inventory Clerk</h4>
+                            <p>Manages and tracks a company's stock levels.</p>
+                        </div>
+                        <div class="list-item" onclick="openPopup(16)">
+                            <img src="https://www.gainasoftware.com/wp-content/uploads/2024/08/Bonded-Warehouse.png" alt="Inventory Execeitive">
+                            <h4>Inventory Execeitive</h4>
+                            <p>Manages and maintains inventory levels, ensuring accuracy through record-keeping, stock audits, and data analysis.</p>
+                        </div>
+                    </div>
+                </div>
+				<div class="dummy-article">
+				<h3>Exports and Imports with Port Management</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="openPopup(17)">
+                            <img src="https://exaultservices.com/wp-content/uploads/2022/05/container-picture-2017.png" alt="Course 1">
+                            <h4>Consignment Agent</h4>
+                            <p>Third-party intermediary who manages the sale and distribution of goods on behalf of the owner</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+			
+			
+            <!-- Training Modules Section -->
+            <div id="training" class="section">
+                <div class="dummy-article">
+                    <h3>Training Modules</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="window.location.href='wms.html'">
+                            <img src="https://www.pikpng.com/pngl/b/539-5398617_warehouse-clipart-inventory-management-warehouse-management-icon-png.png" alt="Warehouse Management">
+                            <h4>Warehouse Management</h4>
+                            <p>Where Storage Meets Strategy.& The Backbone of Supply Chain Excellence</p>
+                        </div>
+                        <div class="list-item" onclick="window.location.href='lms.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/9402/9402149.png" alt="Logistics Management">
+                            <h4>Logistics Management</h4>
+                            <p>From Origin to Destination—Seamlessly.& Moving the World, One Shipment at a Time.</p>
+                        </div>
+                        <div class="list-item" onclick="window.location.href='exim.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/7141/7141914.png" alt="Imports and Exports Management">
+                            <h4>Exports and Imports Management</h4>
+                            <p>Focus on Customs and International Logistics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements Section -->
+            <div id="achievements" class="section">
+                <div class="dummy-article">
+                    <h3>Our Achievements</h3>
+                    <div class="achievements-carousel">
+                        <div class="carousel-slides-container">
+                            <div class="carousel-slide active">
+                                <img src="https://indiashippingnews.com/wp-content/uploads/2025/04/GpIBvUYXsAAVuV2-1.jpg" alt="Achievement 1">
+                                <a href="https://example.com/ach1" target="_blank">DGR Training Program.</a>
+                                <p>Organized under the guidance of the Directorate General Resettlement (DGR), Ministry of Defence, in partnership with the Ministry of Ports,Centre This program equipped ex-servicemen with vital expertise in Port Logistics and Supply Chain Management.</p>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://media.licdn.com/dms/image/v2/D4D22AQEY25JOvJNlxA/feedshare-shrink_800/B4DZh1AfvVHYAg-/0/1754309722573?e=2147483647&v=beta&t=IqQNFSU2dFanJBzYS73SAcI_AkUz4ufDqDMeqUNqNlc" alt="Achievement 2">
+                                <a href="https://example.com/ach2" target="_blank">Mumbai Entrepreneurship Program</a>
+                                <p>Conclusion of 45-Day Training on Supply Chain Management & Logistics Sponsored by Maharashtra Centre for Entrepreneurship Development (MCED)</p>
+                            </div>
+							 <div class="carousel-slide">
+                                <img src="https://almashines.s3.dualstack.ap-southeast-1.amazonaws.com/assets/images/gallary_photos/t1760526871_SvnU2GqVlH.jpg" alt="Achievement 6">
+                                <a href="https://example.com/ach6" target="_blank">ASR Logistics Training program </a>
+                                <p>Socessfully completed Alluri Sitha Ramaraju District Trible Batch</p>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="http://www.viscan.in/wp-content/uploads/2024/07/CEMS-VPA-copy-696x420.jpg" alt="Achievement 3">
+                                <a href="https://example.com/ach3" target="_blank">VPA Skill Develoupment Program</a>
+                                <p>Achieved high placement success for graduates.</p>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://media.licdn.com/dms/image/v2/D5622AQFcjq965vC07Q/feedshare-shrink_800/B56ZaRu5ZQHAAk-/0/1746201713891?e=2147483647&v=beta&t=huxj9Bhsz0JYbML4jD519nP9ynAZmhlQlDYz-0CgSB8" alt="Achievement 4">
+                                <a href="https://example.com/ach4" target="_blank">Dr.Lankapalli Bullayya College</a>
+                                <p>This collaboration marks a significant step toward expanding skill development opportunities in core engineering and logistics domains for students of Dr.Lankapalli Bullayya College and other institutions in the region.</p>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://media.licdn.com/dms/image/v2/D4D22AQFXqddUUfcoFA/feedshare-shrink_800/B4DZa0NdeZG0As-/0/1746780151568?e=2147483647&v=beta&t=nAQc8W3Gu1XBmG6Bu85_PBvYi7cjx1EXtfcNCp6K2CU" alt="Achievement 5">
+                                <a href="https://example.com/ach5" target="_blank">DGR Program</a>
+                                <p>This month at CEMS Visakhapatnam, we successfully completed the Directorate General of Resettlement-sponsored training for JCOs/ORs and equivalent ranks in Port Logistics and Supply Chain Management. </p>
+                            </div>
+                            <div class="carousel-slide">
+                                <img src="https://media.licdn.com/dms/image/v2/D5622AQGZy5MKfJmcyQ/feedshare-shrink_800/feedshare-shrink_800/0/1721985933589?e=2147483647&v=beta&t=ppMejF9KfYF3Xn1RCc-9G5LKOqUTvFTUcOk1ZD8GndQ" alt="Achievement 6">
+                                <a href="https://example.com/ach6" target="_blank">Industrial Visit for Logistics Students</a>
+                                <p>CEMS has provided Industrial visits for the Students for Better understanding of the subject to gain pratical knoledge</p>
+                            </div>
+                        </div>
+                        <div class="carousel-controls">
+                            <button class="carousel-btn" id="prevBtn">← Previous</button>
+                            <div class="carousel-dots" id="dotsContainer"></div>
+                            <button class="carousel-btn" id="nextBtn">Next →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Manual Section -->
+            <div id="manual" class="section">
+                <div class="dummy-article">
+                    <h3>User Manual</h3>
+                    <p>This user manual provides step-by-step guidance on navigating the e-learning portal. Start by selecting a sidebar item to access different sections.</p>
+                    <p>For technical support, contact the admin team via the provided channels.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <!-- Logistics Team Carousel -->
+            <div class="info-card">
+                <div class="card-header">
+                    <img src="https://thumbs.dreamstime.com/b/leader-trainer-icon-vector-sketch-well-organized-simple-use-commercial-purposes-web-printing-any-type-design-projects-241215723.jpg" alt="Trainer">
+                    <div class="card-title">Meet The Logistics & Supplychain Training and Management Team</div>
+                </div>
+                <div class="trainer-carousel">
+                    <div class="carousel-slide-trainer active">
+                        <img src="prajit.jpg" alt="Prajith Kurup"/>
+                        <div class="trainer-name">Prajit Kurup</div>
+                        <div class="trainer-role">Logistics Head-Project Manager</div>
+                        <div class="tp-code">All Govt Skill develoupment & CSR programs</div>
+                    </div>
+                    <div class="carousel-slide-trainer">
+                        <img src="praveen.jpg" alt="Praveen Koyyana"/>
+                        <div class="trainer-name">Praveen Koyyana</div>
+                        <div class="trainer-role">Lead Logistics Trainer</div>
+                        <div class="tp-code">SCM, Strategic Management & Student career counseling</div>
+                    </div>
+                    <div class="carousel-slide-trainer">
+                        <img src="sandeep.jpg" alt="Y.K.Sandeep"/>
+                        <div class="trainer-name">Y.K.Sandeep</div>
+                        <div class="trainer-role">Logistics Trainer</div>
+                        <div class="tp-code">International Logistics & Inventory Management</div>
+                    </div>
+                    <div class="carousel-slide-trainer">
+                        <img src="balaji.jpg" alt="T.Balaji"/>
+                        <div class="trainer-name">T.Balaji</div>
+                        <div class="trainer-role">Logistics Trainer</div>
+                        <div class="tp-code">Warehouse Management and Skill Develoupment</div>
+                    </div>
+                </div>
+                <div class="carousel-nav">
+                    <span class="nav-arrow" id="prev-arrow">◄</span>
+                    <div class="carousel-controls-trainer">
+                        <span class="dot active" data-slide="0"></span>
+                        <span class="dot" data-slide="1"></span>
+                        <span class="dot" data-slide="2"></span>
+                        <span class="dot" data-slide="3"></span>
+                    </div>
+                    <span class="nav-arrow" id="next-arrow">►</span>
+                </div>
+            </div>
+
+            <!-- Live Clock -->
+            <div class="sidebar-card">
+                <h3>Current Time</h3>
+                <div class="clock-display">
+                    <div class="clock-time" id="clockTime">00:00:00</div>
+                    <div class="clock-date" id="clockDate">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Trainee Login Information -->
+            <div class="info-card">
+                <div class="card-header">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6429/6429204.png" alt="Trainee Logo">
+                    <div class="card-title">Trainee Login Information</div>
+                </div>
+                <div class="card-content">
+                    <ul class="login-info">
+                        <li><strong>City:	</strong>	Visakhapatnam</li>
+                        <li><strong>State:	</strong>	Andhra Pradesh</li>
+                        <li><strong>Country:	</strong>	INDIA</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Logout Button -->
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </aside>
+    </div>
+
+    <!-- Modal -->
+	
+    <div id="popupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <div id="popupContent"></div>
+        </div>
+    </div>
+	
+		<div id="popup1" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(1)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://logos-world.net/wp-content/uploads/2020/06/Amazon-Logo.png" alt="Amazon">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Amazon</div>
+                <p><span>About</span><br>
+                   Amazon is best described as a global logistics and e-commerce company with a powerful, vertically integrated supply chain that handles everything from warehousing and inventory management to last-mile delivery. It operates not only as an online retailer but also as a logistics provider for other businesses through services like Fulfillment by Amazon (FBA). Its supply chain is built on massive infrastructure, advanced technology like robotics and AI, and innovative delivery methods such as drone delivery via Amazon Prime Air. </p>
+                <p><span>Job Offers</span><br>
+                   Warehouse Pickers,Packers and Warehouse Execuitive</p>
+               <p><span>Basic Requirements</span><br>
+					</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup2" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(2)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png" alt="Flipkart">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Flipkart</div>
+                <p><span>About</span><br>
+                   Flipkart is a major Indian e-commerce company, founded in 2007, that started by selling books and has since expanded to offer a wide range of products including electronics, fashion, home goods, and groceries. It operates as a marketplace where customers can shop online, with Flipkart handling logistics, delivery, and customer service, and also offers services like Cash on Delivery and easy returns.</p>
+                <p><span>Job Offers</span><br>
+                   </p>
+               <p><span>Basic Requirements</span><br>
+					</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup3" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(3)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://miro.medium.com/v2/resize:fit:808/0*3aUI_k4MUkiCmBoz.png" alt="Zepto">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Zepto</div>
+                <p><span>About</span><br>
+                   Zepto is an Indian quick-commerce company that offers fast, online delivery of groceries and other essentials, promising delivery in 10 minutes. Founded in 2021 by Aadit Palicha and Kaivalya Vohra, it operates a network of "dark stores" or micro-warehouses to fulfill orders quickly across more than 50 cities in India. The company's platform includes a wide range of products, from fresh produce to beauty items, and even a "Cafe" menu for ready-to-eat food. </p>
+                <p><span>Job Offers</span><br>
+                   </p>
+               <p><span>Basic Requirements</span><br>
+					</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup4" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(4)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://content3.jdmagicbox.com/comp/temp/e9/0866px866.x866.110208155557.v8e9/catalogue/-oygboh41u2.jpg" alt="Navata">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Navata Logistics & Supplychain</div>
+                <p><span>About</span><br>
+                  Navata Transport, or Navata Road Transport, is a South Indian road logistics and transport company established in 1982. It provides a range of services, including full and less-than-truckload (FTL/LTL) shipments, warehousing, and reverse logistics. With a large network of branches across several states, the company focuses on providing efficient, technology-driven, and reliable end-to-end logistics solutions for businesses.  </p>
+                <p><span>Job Offers</span><br>
+                   </p>
+               <p><span>Basic Requirements</span><br>
+					</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup5" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(5)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Blinkit-yellow-rounded.svg/2048px-Blinkit-yellow-rounded.svg.png" alt="Blinkit">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Blinkit</div>
+               <p><span>About</span><br>
+                   Blinkit is an Indian quick-commerce platform that delivers groceries, fruits, vegetables, and other daily essentials in minutes through a hyperlocal delivery model. It operates using a network of "dark stores" and partners with local stores to offer a wide range of products, from milk and eggs to electronics and cosmetics. Originally launched as Grofers in 2013, the company rebranded to Blinkit in 2021 to emphasize its focus on instant delivery and was acquired by Zomato in 2022. </p>
+                <p><span>Job Offers</span><br>
+                   </p>
+               <p><span>Basic Requirements</span><br>
+					</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup6" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(6)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://www.techtarget.com/rms/onlineImages/erp-supply_chain_management_mobile.png" alt="Supplychain Executive">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Supplychain Executive</div>
+                <p><span>Overview</span><br>
+                   A Supply Chain Executive manages and coordinates the entire flow of goods and services from raw materials to the final customer. Key responsibilities include managing procurement, production planning, logistics, and inventory to ensure efficiency and cost-effectiveness. This role requires strong analytical, communication, and leadership skills, often involving the use of ERP systems and collaboration with various internal and external teams.</p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Components and Sub-Sectors of Supply Chain and Logistics Sector</br>
+1.2 Job Role of a Supply Chain Executive</br>
+1.3 Documents Required in Plant Operations and Goods Transport</br>
+1.4 MHEs and Equipment used in a Warehouse</br>
+1.5 Activities in a Transport Yard</br>
+Unit 2</br>
+2.1 Procurement Management and cycle</br>
+2.2 " 5 Rights" of procurement</br>
+2.3 Procurement Vs Purchasing Vs Sourcing</br>
+2.4 Spend analysis and management</br>
+2.5 Competitive bidding and tendering</br>
+Unit 3</br>
+3.1 Vendor strategy and planning</br>
+3.2 Sourcing and Selection</br>
+3.3 Contract management and Negotiation</br>
+3.4 Vendor Onboarding and integration</br>
+3.5 Performance monitoring and Risk and compliance management</br>
+Unit 4</br>
+4.1 Supplier Strategic planning</br>
+4.2 Supplier selection and identification</br>
+4.3 Evaluation and performance measurement</br>
+4.4 Supplier relationship management</br>
+4.5 Logistics and distribution</br>
+Unit 5</br>
+5.1 Supply chain risk management</br>
+5.2 Green supply chain practices</br>
+5.3 Supply chain analytics and big data</br>
+5.4 Supply chain consolidation</br>
+5.5 Measuring the bullwhip effect</p>
+               
+			</div>
+        </div>
+	</div>
+		<div id="popup7" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(7)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://kontrakhukum.com/media/2025/05/Persyaratan-dan-Prosedur-Pendirian-PT-untuk-E-Commerce-di-Indonesia.jpg" alt="E-Commerce & Entrepreneurship">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">E-Commerce & Entrepreneurship</div>
+               <p><span>Overview</span><br>
+                   The electronic buying and selling of goods and services online, which provides entrepreneurs with powerful tools to start and grow businesses. This relationship allows for lower costs, increased reach into global markets, 24/7 operation, and enhanced customer service opportunities. E-commerce provides entrepreneurs with the channels to innovate and create competitive advantages, ranging from small home-based operations to large global enterprises. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 E-commerce Definitions & Features</br>
+1.2 History and evolution & Types and models of Ecommerce Business</br>
+1.3 E-commerce Business models , Website and hosting</br>
+1.4 Impact and Setting up of E-commerce</br>
+1.5 Supply chain management (SCM) Online Suppliers and Seller Support</br>
+Unit 2</br>
+2.1 E-marketing strategy & Online promotion</br>
+2.2 Advertising & Branding</br>
+2.3 Customer Relationship Management - CRM</br>
+2.4 Electronic Data Interchange (EDI)</br>
+2.5 Payment systems & Network technology</br>
+Unit 3</br>
+3.1 Artificial intelligence (AI) and machine learning</br>
+3.2 Virtual and augmented reality (VR/AR)</br>
+3.3 Blockchain technology & User-generated content (UGC)</br>
+3.4 Digital marketing & Search engine optimization (SEO)</br>
+3.5 Pricing strategies, E-branding, Omnichannel strategy</br>
+Unit 4</br>
+4.1 E-commerce customer convenience & Consumer decision-making</br>
+4.2 Mobile commerce (M-commerce) & User experience (UX) and interface
+(UI)</br>
+4.3 Voice search & Payment solutions</br>
+4.4 Business intelligence & Logistics and delivery</br>
+4.5 Legal issues, Cybercrime & Security threats</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup8" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(8)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://hyphenscs.com/storage/blog_images/M371cfwmjhv1YIewfOjNXTGiCkZzYZ9fEjwwQ2vv.png" alt="Warehouse Executive">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Warehouse Executive</div>
+               <p><span>Overview</span><br>
+                   A warehouse executive manages daily warehouse operations, ensuring goods are received, stored, and dispatched efficiently and safely. Their responsibilities include managing staff and systems, overseeing inventory levels, ensuring productivity targets are met, and maintaining health, safety, and security standards for the facility and its stock. Key skills for this role include inventory management, team leadership, and problem-solving. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Role of the warehouse</br>
+1.2 Types of warehouses</br>
+1.3 Supply chain trends</br>
+1.4 General warehouse layout & Space optimization</br>
+1.5 Material handling and equipment</br>
+Unit 2</br>
+2.1 Inventory Management</br>
+2.2 Stock Management</br>
+2.3 Returns Management</br>
+2.4 Workforce management - Operation & HR</br>
+2.5 Automation & Data and performance measurement</br>
+Unit 3</br>
+3.1 The Safety Rules In A Warehouse</br>
+3.2 Cargo- Loading and Unloading Procedure</br>
+3.3 5S Concept on the Shop Floor</br>
+3.4 Procedure for Arranging Freight</br>
+3.5 Put Away of Goods, Receiving, Order Picking strategies</br>
+Unit 4</br>
+4.1 Cost Effectiveness of Transportation</br>
+4.2 ERP use in WMS System</br>
+4.3 Factors determining distribution process in Logistics</br>
+4.4 Warehouse manager role Challenges, leadership, and people management</br>
+4.5 Performance management</br>
+Unit 5</br>
+5.1 Analysing warehouse costs & Strategies for cost minimization</br>
+5.2 Barcode, RFID scanning & Robotics</br>
+5.3 Using third-party logistics (3PL) (4PL)</br>
+5.4 Health and safety Protocols and procedures</br>
+5.5 Security & Regulatory compliance</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup9" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(9)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://cyzerg.com/wp-content/uploads/Body-image-Warehouse-Manager-%CE%93Co-Roles-and-Responsibilities.webp" alt="Warehouse Superwiser
+">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Warehouse Superwiser</div>
+            <p><span>Overview</span><br>
+                   A warehouse supervisor oversees daily warehouse operations, including managing staff, inventory, and ensuring efficient receiving, storing, and shipping of products. Key responsibilities involve enforcing safety standards and implementing company policies to maintain productivity and quality. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Role of the warehouse</br>
+1.2 Types of warehouses</br>
+1.3 Supply chain trends</br>
+1.4 General warehouse layout & Space optimization</br>
+1.5 Material handling and equipment</br>
+Unit 2</br>
+2.1 Inventory Management</br>
+2.2 Stock Management</br>
+2.3 Returns Management</br>
+2.4 Workforce management - Operation & HR</br>
+2.5 Automation & Data and performance measurement</br>
+Unit 3</br>
+3.1 The Safety Rules In A Warehouse</br>
+3.2 Cargo- Loading and Unloading Procedure</br>
+3.3 5S Concept on the Shop Floor</br>
+3.4 Procedure for Arranging Freight</br>
+3.5 Put Away of Goods, Receiving, Order Picking strategies</br>
+Unit 4</br>
+4.1 Cost Effectiveness of Transportation</br>
+4.2 ERP use in WMS System</br>
+4.3 Factors determining distribution process in Logistics</br>
+4.4 Warehouse manager role Challenges, leadership, and people management</br>
+4.5 Performance management</br>
+Unit 5</br>
+5.1 Analysing warehouse costs & Strategies for cost minimization</br>
+5.2 Barcode, RFID scanning & Robotics</br>
+5.3 Using third-party logistics (3PL) (4PL)</br>
+5.4 Health and safety Protocols and procedures</br>
+5.5 Security & Regulatory compliance</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup10" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(10)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://www.linbis.com/wp-content/uploads/2025/02/dalle-2025-02-19-15-56-15-a-high-definition-realistic-image-of-a-cargo_freight-agent-at-an-airport-cargo-terminal-the-agent-is-wearing-a-uniform-and-using-a-handheld-scanner.webp" alt="Logistics Execuitive">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Logistics Execuitive</div>
+            <p><span>Overview</span><br>
+                   A logistics executive manages the movement and storage of goods, overseeing transportation, inventory, and supplier relations to ensure timely and cost-effective delivery. Their responsibilities include coordinating with carriers, managing warehouse stock, processing orders, and ensuring compliance with regulations. </p>
+                <p><span>Topics Covered</span><br>
+					Unit 1</br>
+1.1 Logistics Overview</br>
+1.2 Logistics Sub Sectors & Opportunities</br>
+1.3 Activities, Job Roles & Interfaces of a transport consolidator</br>
+1.4 Scheduling of Deliveries & Route planning and optimization</br>
+1.5 Compute Loading Requirements to identify type of vehicle required.</br>
+Unit 2</br>
+2.1 Verification of orders</br>
+2.2 Consolidation of Deliveries</br>
+2.3 Updating Tracking Information</br>
+2.4 post-consolidation activities</br>
+2.5 International logistics and consolidation</br>
+Unit 3</br>
+3.1 Reverse logistics</br>
+3.2 Carrier relations & Logistical liaison</br>
+3.3 Consolidation techniques</br>
+3.4 Logistics software & Data analysis</br>
+3.5 Emerging technologies & Freight management</br>
+Unit 4</br>
+4.1 Health, Safety & Security at Ports, CFS &ICD</br>
+4.2 SOP while handling Dangerous & Hazardous Goods</br>
+4.3 Standard Protocol in case of Emergencies /Accidents/Breach of Safety</br>
+4.4 Document Health, Safety & Security Violations/ Escalation Matrix</br>
+4.5 Regulatory compliance</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup11" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(11)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://5.imimg.com/data5/SELLER/Default/2025/5/509819855/WE/AS/KJ/2659179/consignment-agent-services-1-500x500.jpg" alt="Transportation Consolidator">
+			</div>
+            <div class="popup-text-container">
+                <div class="popup-header">Transportation Consolidator</div>
+             <p><span>Overview</span><br>
+                   A transportation or freight consolidator is a company that combines multiple smaller shipments from different shippers into a single, larger shipment, such as a full container load. This process reduces shipping costs for all parties involved by enabling them to access bulk shipping rates and optimizes transportation efficiency. Consolidators handle the coordination of these smaller shipments at a central hub before the consolidated load is transported. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Logistics Overview</br>
+1.2 Logistics Sub Sectors & Opportunities</br>
+1.3 Activities, Job Roles & Interfaces of a transport consolidator</br>
+1.4 Scheduling of Deliveries & Route planning and optimization</br>
+1.5 Compute Loading Requirements to identify type of vehicle required.</br>
+Unit 2</br>
+2.1 Verification of orders</br>
+2.2 Consolidation of Deliveries</br>
+2.3 Updating Tracking Information</br>
+2.4 post-consolidation activities</br>
+2.5 International logistics and consolidation</br>
+Unit 3</br>
+3.1 Reverse logistics</br>
+3.2 Carrier relations & Logistical liaison</br>
+3.3 Consolidation techniques</br>
+3.4 Logistics software & Data analysis</br>
+3.5 Emerging technologies & Freight management</br>
+Unit 4</br>
+4.1 Health, Safety & Security at Ports, CFS &ICD</br>
+4.2 SOP while handling Dangerous & Hazardous Goods</br>
+4.3 Standard Protocol in case of Emergencies /Accidents/Breach of Safety</br>
+4.4 Document Health, Safety & Security Violations/ Escalation Matrix</br>
+4.5 Regulatory compliance </p>
+			</div>
+        </div>
+	</div>
+		<div id="popup12" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(12)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://onro.io/wp-content/uploads/2024/02/Next-day-delivery.webp" alt="Delivery Execeitive">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Delivery Execeitive</div>
+         <p><span>Overview</span><br>
+                   A delivery executive transports goods, documents, or food from one location to another, typically using a vehicle like a motorcycle or bicycle. Key duties include picking up items from a hub, safely and on time delivering them to customers, collecting payments, and using navigation to find addresses. This is a physically demanding role often involving flexible shifts and incentive-based pay structures in addition to a fixed salary.</p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Introduction to Logistics and Courier Service</br>
+1.2 Activities in Courier Services</br>
+1.3 Roles of Courier Delivery Executive</br>
+1.4 Understanding Required for Courier Delivery Executive</br>
+1.5 Loading packages & Using technology</br>
+Unit 2</br>
+2.1 Trip and delivery planning</br>
+2.2 Route optimization & Package handling</br>
+2.3 Vehicle inspection & Documentation</br>
+2.4 Safe vehicle operation & Navigation</br>
+2.5 Customer interaction & Payment collection</br>
+Unit 3</br>
+3.1 Security protocols</br>
+3.2 Problem resolution & Proof of delivery</br>
+3.3 Reporting & Return-to-origin procedures</br>
+3.4 Exception management</br>
+3.5 Workplace safety & Vehicle Safety</br>
+Unit 4</br>
+4.1 Time management</br>
+4.2 Communication & Physical fitness</br>
+4.3 Adaptability & Reliability</br>
+4.4 Courier and Food package delivery</br>
+4.5 E-commerce delivery</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup13" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(13)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://dom-website-prod-cdn-cms.porter.in/intercity_banner_bf6222c42d.webp" alt="Courier Operators">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Courier Operators</div>
+              <p><span>Overview</span><br>
+                   Courier operators are companies that provide services for sending and receiving packages, with many local and international options available in Visakhapatnam, including major names like DTDC, Blue Dart, DHL, and FedEx. Other popular local and international courier operators in the city include The Professional Couriers, Ecom Express, Xpressbees, Delhivery, First Flight Couriers, Gati Limited, and many others listed on local service directories. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Introduction to Logistics and Courier Service</br>
+1.2 Activities in Courier Services</br>
+1.3 Roles of Courier Delivery Executive</br>
+1.4 Understanding Required for Courier Delivery Executive</br>
+1.5 Loading packages & Using technology</br>
+Unit 2</br>
+2.1 Trip and delivery planning</br>
+2.2 Route optimization & Package handling</br>
+2.3 Vehicle inspection & Documentation</br>
+2.4 Safe vehicle operation & Navigation</br>
+2.5 Customer interaction & Payment collection</br>
+Unit 3</br>
+3.1 Security protocols</br>
+3.2 Problem resolution & Proof of delivery</br>
+3.3 Reporting & Return-to-origin procedures</br>
+3.4 Exception management</br>
+3.5 Workplace safety & Vehicle Safety</br>
+Unit 4</br>
+4.1 Time management</br>
+4.2 Communication & Physical fitness</br>
+4.3 Adaptability & Reliability</br>
+4.4 Courier and Food package delivery</br>
+4.5 E-commerce delivery</p>
+        </div>
+		</div>
+	</div>
+		<div id="popup14" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(14)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://www.dhl.com/discover/adobe/dynamicmedia/deliver/dm-aid--c8218877-c027-4a62-bb38-02ad395c5f04/inline-images-800x450-2.jpg?quality=82&preferwebp=true" alt="Port Logistics">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Port Logistics</div>
+               <p><span>Overview</span><br>
+                   Port logistics is the management of all activities that involve the movement, handling, and storage of goods as they pass through a port, connecting different modes of transportation. This includes everything from unloading cargo from ships and storing it in yards or warehouses to its final delivery by land, and it is a crucial part of the global supply chain. Efficient port logistics reduces costs, minimizes delays, and is vital for international trade. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Overview of port operations</br>
+1.2 Port and terminal management</br>
+1.3 Maritime transport and shipping & Port security and regulations</br>
+1.4 Logistics information systems (LIS) & Electronic Data Interchange</br>
+(EDI)</br>
+1.5 Bar coding and RFID technology</br>
+Unit 2</br>
+2.1 Port automation - Automated storage and retrieval systems</br>
+2.2 Automated guided vehicles (AGVs) in port terminals</br>
+2.3 Disruptive technologies - AI, Machine Learning, IoT</br>
+2.4 Port Management Information Systems (PMIS)</br>
+2.5 Cybersecurity in ports & Blockchain and smart contracts</br>
+Unit 3</br>
+3.1 Maritime business and economics</br>
+3.2 Port planning and development</br>
+3.3 International maritime law and regulations (IMO)</br>
+3.4 Digital twins in ports</br>
+3.5 Smart and green port initiatives</br>
+Unit 4</br>
+4.1 Strategy and digital transformation</br>
+4.2 Port innovation ecosystems</br>
+4.3 Management information systems (MIS)</br>
+4.4 Data analytics for logistics</br>
+4.5 Logistics optimization</br>
+Unit 5</br>
+5.1 Principles of freight calculation and freight forwarding.</br>
+5.2 Application of Incoterms in international trade</br>
+5.3 Handling of special cargo, including dangerous goods &
+Containerization and FCL/LCL cargo</br>
+5.4 Classification of goods (e.g., HSN system) and valuation methods.</br>
+5.5 Green Logistics (Fundamentals, environmental impact, challenges)</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup15" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(15)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/wp1lcwdav1p1/1un6n2t3qDgOFvH9xibK1f/0981ca88e6c56c756b3da76e852bd872/GettyImages-1367106352__1_.jpg?w=1500&h=680&q=60&fit=fill&f=faces&fm=jpg&fl=progressive&auto=format%2Ccompress&dpr=1&w=1000" alt="Inventory Clerk">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Inventory Clerk</div>
+             <p><span>Overview</span><br>
+                   An inventory clerk is responsible for tracking and managing a company's stock, ensuring accurate records of all incoming and outgoing products. Their duties include receiving and organizing stock, conducting regular stock counts, and using software to maintain databases. They also report discrepancies, prepare reports for management, and ensure the workspace is organized and safe. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Introduction to inventory & Costs associated with inventory</br>
+1.2 Demand & Supply forecasting</br>
+1.3 Inventory logistics</br>
+1.4 Receiving goods & Processing shipments</br>
+1.5 Key Decision to Perform an Inventory Count</br>
+Unit 2</br>
+2.1 Phases in Inventory Counting</br>
+2.2 Deciding the Frequency and Number of Counting</br>
+2.3 Knowledge and Understanding Organizational Products</br>
+2.4 Labels and Coding Systems</br>
+2.5 Inventory software & Barcode and RFID technology</br>
+Unit 3</br>
+3.1 Maintaining General Safety and Discipline</br>
+3.2 Safety and Security Procedures</br>
+3.3 Personal Protective Equipment</br>
+3.4 Material Handling Equipment</br>
+3.5 Occupational/ Environmental Health and Safety</br>
+Unit 4</br>
+4.1 Risk and Impact of Deviating Work Procedure</br>
+4.2 Dealing with Damages and Losses</br>
+4.3 Inventory audits & Discrepancy reconciliation</br>
+4.4 Reporting & Data Entry</br>
+4.5 Cross-departmental collaboration & Professional communication</br>
+Unit 5</br>
+5.1 ABC analysis & Just-in-Time (JIT)</br>
+5.2 First-In, First-Out (FIFO) and Last-In, First-Out (LIFO)</br>
+5.3 Economic Order Quantity (EOQ) Safety stock and reorder points</br>
+5.4 Cloud-based inventory software</br>
+5.5 AI and machine learning</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup16" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(16)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://www.gainasoftware.com/wp-content/uploads/2024/08/Bonded-Warehouse.png" alt="Inventory Execeitive">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Inventory Execeitive</div>
+             <p><span>Overview</span><br>
+                   An inventory executive manages and tracks stock levels to ensure efficient operations, using software for record-keeping, auditing, and process improvement. Their duties include overseeing inventory, coordinating with suppliers and logistics, maintaining accurate data, and assisting with quality control for incoming and outgoing goods. This role requires strong analytical and organizational skills, and often a bachelor's degree in logistics, supply chain management, or a related field, plus experience with inventory management software and strong Excel skills. </p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Introduction to inventory & Costs associated with inventory</br>
+1.2 Demand & Supply forecasting</br>
+1.3 Inventory logistics</br>
+1.4 Receiving goods & Processing shipments</br>
+1.5 Key Decision to Perform an Inventory Count</br>
+Unit 2</br>
+2.1 Phases in Inventory Counting</br>
+2.2 Deciding the Frequency and Number of Counting</br>
+2.3 Knowledge and Understanding Organizational Products</br>
+2.4 Labels and Coding Systems</br>
+2.5 Inventory software & Barcode and RFID technology</br>
+Unit 3</br>
+3.1 Maintaining General Safety and Discipline</br>
+3.2 Safety and Security Procedures</br>
+3.3 Personal Protective Equipment</br>
+3.4 Material Handling Equipment</br>
+3.5 Occupational/ Environmental Health and Safety</br>
+Unit 4</br>
+4.1 Risk and Impact of Deviating Work Procedure</br>
+4.2 Dealing with Damages and Losses</br>
+4.3 Inventory audits & Discrepancy reconciliation</br>
+4.4 Reporting & Data Entry</br>
+4.5 Cross-departmental collaboration & Professional communication</br>
+Unit 5</br>
+5.1 ABC analysis & Just-in-Time (JIT)</br>
+5.2 First-In, First-Out (FIFO) and Last-In, First-Out (LIFO)</br>
+5.3 Economic Order Quantity (EOQ) Safety stock and reorder points</br>
+5.4 Cloud-based inventory software</br>
+5.5 AI and machine learning</p>
+			</div>
+        </div>
+	</div>
+		<div id="popup17" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(17)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://exaultservices.com/wp-content/uploads/2022/05/container-picture-2017.png" alt="Consignment Agent">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Consignment Agent</div>
+             <p><span>Overview</span><br>
+                   A consignment agent is a third-party intermediary who sells goods on behalf of an owner (the consignor) for a commission or fee. The agent takes possession of the goods, markets them, and handles the logistics, but the consignor retains ownership until the goods are sold. This model is common in industries like retail, art, and electronics, and allows the consignor to expand their market reach without managing direct sales, according to IndiaMART.</p>
+                <p><span>Topics Covered</span><br>
+                   Unit 1</br>
+1.1 Definition and models of imports and exports</br>
+1.2 Various Policies of Imports and Exports</br>
+1.3 Trade surplus and deficit</br>
+1.4 Understanding Pre and Post shipment documents</br>
+1.5 Multi-Modal Logistics (MML)</br>
+Unit 2</br>
+2.1 Ports and the maritime business</br>
+2.2 Multi-disciplinary approaches to port operations and management</br>
+2.3 Port roles and functions</br>
+2.4 Emerging Trends and Innovations in Logistics</br>
+2.5 Buyer Management</br>
+Unit 3</br>
+3.1 Inco terms</br>
+3.2 Bill of Lading and its types</br>
+3.3 Bill of Entry and its Types</br>
+3.4 Fumigations and phytosanitary certificates</br>
+3.5 Letter of Credit and bill of exchange</br>
+Unit 4</br>
+4.1 Freight forwarder</br>
+4.2 difference between carrier and freight forwarder</br>
+4.3 Types of Containers</br>
+4.4 Booking of vessels and container in freight forwarding</br>
+4.5 Freight Forwarding Office & Field Activities</br>
+Unit 5</br>
+5.1 Planning and Arranging cargo Imports & Exports</br>
+5.2 Cargo Handling Process</br>
+5.3 Maintaining Integrity Ensuring Data Security</br>
+5.4 Ensuring regulatory Compliance</br>
+5.5 Ensuring Compliance to Health, Safety and Security</p>
+			</div>
+        </div>
+	</div>
+	<div id="popup18" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(18)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://content.jdmagicbox.com/v2/comp/delhi/41/011p70641/catalogue/directorate-general-resettlement-rk-puram-sector-1-delhi-government-organisations-1838pe2fgk.jpg" alt="DGR">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Directorate General Resettlement</div>
+             <p><span>Overview</span><br>
+                   The Directorate General Resettlement (DGR) is an inter-service organization under India's Ministry of Defence that facilitates the resettlement of ex-servicemen (ESM) into a second career. It accomplishes this by providing pre- and post-retirement training, skill development, and employment opportunities in the corporate and self-employment sectors. The DGR acts as an interface between retiring service personnel and potential employers or training institutions. </p>
+                <p><span>Batch Information</span><br>
+                   Sucessfully completed 4+ Batches and trained 160+ Students</p>
+			</div>
+        </div>
+	</div>
+	<div id="popup19" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(19)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://upload.wikimedia.org/wikipedia/en/a/ab/Deen_Dayal_Upadhyaya_Grameen_Kaushalya_Yojana.jpg" alt="DDUGKY">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">DDUGKY</div>
+             <p><span>Overview</span><br>
+                   Deen Dayal Upadhyaya Grameen Kaushalya Yojana, is a government skill development program in India that focuses on providing vocational training to rural youth from poor families. The program aims to transform them into a globally relevant workforce by offering demand-led skill training and ensuring placement with post-placement support to achieve sustainable employment.</p>
+                <p><span>Batch Information</span><br>
+                   Sucessfully completed 3+ Batches and trained 90+ Students</p>
+			</div>
+        </div>
+	</div>
+	<div id="popup20" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(20)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://ibef.org/uploads/govtschemes/PMKVY-july-2025.png" alt="PMKVY">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">PMKVY</div>
+             <p><span>Overview</span><br>
+                   Pradhan Mantri Kaushal Vikas Yojana, which is the Indian government's flagship scheme to encourage skill development among youth. Launched in 2015, its goal is to provide free, short-term skill training and certify individuals to improve their employability and livelihood opportunities. The scheme also includes a component called Recognition of Prior Learning (RPL) to certify individuals who already have prior skills or experience. </p>
+                <p><span>Batch Information</span><br>
+                   Sucessfully completed 14+ Batches and trained 450+ Students</p>
+			</div>
+        </div>
+	</div>
+	<div id="popup21" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(21)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://vpt.shipping.gov.in/assets/images/new-img/vpa-logonew.jpg" alt="VPA">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">VPA</div>
+             <p><span>Overview</span><br>
+                   The Visakhapatnam Port Authority (VPA) is the management body for the Port of Visakhapatnam, one of India's 12 major ports, located on the country's east coast. It handles maritime trade, cargo handling (including bulk commodities, containers, and petroleum products), and logistics for a wide range of goods, and operates as an independent body for its administrative and operational tasks. </p>
+                <p><span>Batch Information</span><br>
+                   Sucessfully completed 4+ Batches and trained 120+ Students</p>
+			</div>
+        </div>
+	</div>
+	<div id="popup22" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(22)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://vedantaspark.com/SiteAssets/images/Vedanta.png" alt="Vedantha">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Vedantha</div>
+             <p><span>Overview</span><br>
+                   Vedanta Limited is a global natural resources company with operations in India, Africa, and the Middle East, focusing on commodities like zinc, copper, aluminium, and oil & gas. The Mumbai-headquartered company is a subsidiary of the London-based Vedanta Resources and is involved in the exploration, extraction, and processing of minerals and oil. Key business segments include aluminium, zinc-lead-silver, and oil & gas, with additional activities in steel, copper, power, and nickel.  </p>
+                <p><span>Batch Information</span><br>
+                   Sucessfully completed 3+ Batches and trained 90+ Students</p>
+			</div>
+        </div>
+	</div>
+	<div id="popup23" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(23)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://ggtgroup.co.in/uploads/testimonials/1720437003_d4bc2e4e60fe1e68fe3b.jpg" alt="TREI">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">TREI</div>
+             <p><span>Overview</span><br>
+                   Toyotsu Rare Earths India Pvt Ltd (TREI), a rare earth element processor in India, or Trei Technology Private Limited, an IT and software company in Noida. Other companies with the acronym TREI include a real estate firm, Trei Real Estate GmbH, and an Indian sugar and engineering company, Triveni Engineering and Industries Ltd. </p>
+                <p><span>Topics Covered</span><br>
+                   Sucessfully completed 2+ Batches and trained 60+ Students</p>
+			</div>
+        </div>
+	</div>
+	
+	<div id="popup24" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" onclick="closePopup(24)">&times;</span>
+            <div class="popup-image-top">
+                <img src="https://content.jdmagicbox.com/comp/pune/65/020p5010165/catalogue/maharashtra-centre-for-entrepreneurship-development-shivaji-nagar-pune-government-organisations-x11z9vm06f.jpg" alt="MCED">
+            </div>
+            <div class="popup-text-container">
+                <div class="popup-header">Maharashtra Centre for Entrepreneurship Development</div>
+             <p><span>Overview</span><br>
+                   The Maharashtra Centre for Entrepreneurship Development (MCED) is a training institute established in 1988 to promote entrepreneurship by providing quality training, hand-holding support for new entrepreneurs, and fostering an entrepreneurial culture in the state. It offers training to individuals wanting to start their own businesses, with a focus on creating successful entrepreneurs and supporting the growth of the state's small and medium enterprises (SMEs). </p>
+                <p><span>Batch Information</span><br>
+                   Sucessfully completed a Batch and trained 40+ Students</p>
+			</div>
+        </div>
+	</div>
+		
+    <script>
+	function openPopup(num) {
+            document.getElementById("popup" + num).style.display = "block";
+        }
+
+        function closePopup(num) {
+            document.getElementById("popup" + num).style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            for (let i = 1; i <= 40; i++) {
+                let popup = document.getElementById("popup" + i);
+                if (event.target == popup) {
+                    popup.style.display = "none";
+                }
+            }
+        }
+        // Trainer Carousel Functionality
+        const slides = document.querySelectorAll('.carousel-slide-trainer');
+        const dots = document.querySelectorAll('.dot');
+        const prevArrow = document.getElementById('prev-arrow');
+        const nextArrow = document.getElementById('next-arrow');
+        let currentSlide = 0;
+        let carouselInterval = setInterval(nextSlideAuto, 3000);
+
+        function updateCarousel(idx) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active', 'left', 'right');
+                if (i === idx) {
+                    slide.classList.add('active');
+                } else if (i < idx) {
+                    slide.classList.add('left');
+                } else {
+                    slide.classList.add('right');
+                }
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === idx);
+            });
+        }
+
+        function nextSlideAuto() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateCarousel(currentSlide);
+        }
+
+        function nextSlideManual() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateCarousel(currentSlide);
+            resetInterval();
+        }
+
+        function prevSlideManual() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateCarousel(currentSlide);
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(carouselInterval);
+            carouselInterval = setInterval(nextSlideAuto, 3000);
+        }
+
+        // Manual navigation arrows
+        nextArrow.addEventListener('click', nextSlideManual);
+        prevArrow.addEventListener('click', prevSlideManual);
+
+        // Dot navigation
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                currentSlide = i;
+                updateCarousel(currentSlide);
+                resetInterval();
+            });
+        });
+
+        // Pause on hover
+        document.querySelector('.trainer-carousel').addEventListener('mouseenter', () => {
+            clearInterval(carouselInterval);
+        });
+
+        document.querySelector('.trainer-carousel').addEventListener('mouseleave', () => {
+            carouselInterval = setInterval(nextSlideAuto, 3000);
+        });
+
+       // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('clockTime').textContent = timeString;
+            document.getElementById('clockDate').textContent = dateString;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+		
+        // Navigation function for sidebar items
+        function navigateTo(section) {
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Show corresponding section
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(section).classList.add('active');
+
+            // For achievements, initialize carousel
+            if (section === 'achievements') {
+                initAchievementsCarousel();
+            }
+        }
+    
+
+        // Achievements Carousel
+        let achCurrent = 0;
+        const achCarouselSlides = document.querySelectorAll('#achievements .carousel-slide');
+        const achTotalSlides = achCarouselSlides.length;
+        let achAutoInterval;
+        const achPrevBtn = document.getElementById('prevBtn');
+        const achNextBtn = document.getElementById('nextBtn');
+        const achDotsContainer = document.getElementById('dotsContainer');
+
+        // Create dots for achievements carousel
+        function createAchievementsDots() {
+            achCarouselSlides.forEach((_, i) => {
+                const dot = document.createElement('span');
+                dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                dot.addEventListener('click', () => goToAchSlide(i));
+                achDotsContainer.appendChild(dot);
+            });
+        }
+
+        function updateAchievementsCarousel() {
+            achCarouselSlides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === achCurrent) {
+                    slide.classList.add('active');
+                }
+            });
+
+            // Update dots
+            const dots = achDotsContainer.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === achCurrent);
+            });
+        }
+
+        function nextAchSlide() {
+            achCurrent = (achCurrent + 1) % achTotalSlides;
+            updateAchievementsCarousel();
+            resetAchAutoInterval();
+        }
+
+        function prevAchSlide() {
+            achCurrent = (achCurrent - 1 + achTotalSlides) % achTotalSlides;
+            updateAchievementsCarousel();
+            resetAchAutoInterval();
+        }
+
+        function goToAchSlide(index) {
+            achCurrent = index;
+            updateAchievementsCarousel();
+            resetAchAutoInterval();
+        }
+
+        function startAchAutoCarousel() {
+            achAutoInterval = setInterval(nextAchSlide, 2000);
+        }
+
+        function resetAchAutoInterval() {
+            clearInterval(achAutoInterval);
+            startAchAutoCarousel();
+        }
+
+        function initAchievementsCarousel() {
+            createAchievementsDots();
+            achPrevBtn.addEventListener('click', prevAchSlide);
+            achNextBtn.addEventListener('click', nextAchSlide);
+            
+            // Pause on hover
+            const achCarouselContainer = document.querySelector('.achievements-carousel');
+            achCarouselContainer.addEventListener('mouseenter', () => {
+                clearInterval(achAutoInterval);
+            });
+            achCarouselContainer.addEventListener('mouseleave', () => {
+                startAchAutoCarousel();
+            });
+
+            startAchAutoCarousel();
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Hamburger menu
+        document.querySelector('.hamburger').addEventListener('click', function() {
+  const leftSidebar = document.querySelector('.sidebar');
+  const rightSidebar = document.querySelector('.right-sidebar');
+  const isHidden = leftSidebar.style.display === 'none';
+  leftSidebar.style.display = isHidden ? 'block' : 'none';
+  rightSidebar.style.display = isHidden ? 'block' : 'none';
+        });
+
+        // Tile hover effects (if tiles were present)
+        document.querySelectorAll('.tile').forEach(tile => {
+            tile.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            tile.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Sidebar active states
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                setTimeout(() => {
+                    this.classList.remove('active');
+                }, 2000);
+            });
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Warehouse Management System loaded successfully');
+            updateClock();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
