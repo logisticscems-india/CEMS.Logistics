@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Management System with Flipbook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #1a1d4d;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .hamburger {
+            cursor: pointer;
+            font-size: 25px;
+        }
+
+        .company-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+        }
+
+        .header-center h1 {
+            font-size: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .trainee-info {
+            text-align: center;
+        }
+
+        .trainee-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .company-name {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            background-color: #0f1139;
+            width: 250px;
+            color: white;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+
+        .sidebar-item span {
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* Main Content Area with Flipbook */
+        .content {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            z-index: 5;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+        }
+
+        /* Flipbook Embedded Styles */
+        .flipbook-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            flex: 1;
+            background: #f0f2f5;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #book {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: auto;
+        }
+
+        #book .turn-page {
+            background-color: white;
+            background-size: 100% 100%;
+        }
+
+        #book .page {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        #book .page img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            margin-top: 20px;
+        }
+
+        .controls button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #1a1d4d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .controls button:hover {
+            background-color: #2a2d6d;
+        }
+
+        .controls button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            width: 300px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #2c3e50;
+        }
+
+        .tp-code {
+            color: #666;
+            font-size: 9px;
+            text-align: center;
+        }
+
+        .login-info {
+            list-style: none;
+        }
+
+        .login-info li {
+            margin-bottom: 1px;
+            color: #555;
+        }
+
+        .login-info strong {
+            color: #2c3e50;
+        }
+
+        /* Live Clock */
+        .clock-display {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            color: #1a1d4d;
+            border-radius: 10px;
+        }
+
+        .clock-time {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .clock-date {
+            font-size: 14px;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Trainer Carousel Styles */
+        .trainer-carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            min-height: 190px;
+            border-radius: 10px;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            transform: translateX(100%);
+            z-index: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 0;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            transform: translateX(0%);
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        .carousel-slide.left {
+            transform: translateX(-100%);
+        }
+
+        .carousel-slide.right {
+            transform: translateX(100%);
+        }
+
+        .trainer-carousel img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 3px solid #e7f9fe;
+            box-shadow: 0 3px 12px 0 rgba(30,130,200,0.15);
+        }
+
+        .trainer-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 5px 0 8px;
+            letter-spacing: 0.5px;
+            color: #1a1d4d;
+            text-align: center;
+        }
+
+        .trainer-role {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding: 0 20px;
+        }
+
+        .nav-arrow {
+            cursor: pointer;
+            font-size: 20px;
+            color: #1a1d4d;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-arrow:hover {
+            color: #4169E1;
+        }
+
+        .dot {
+            height: 8px;
+            width: 8px;
+            margin: 0 3px;
+            background-color: #d0e8f2;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: #4169E1;
+            transform: scale(1.3);
+        }
+
+        .dot:hover {
+            background-color: #5a78ff;
+        }
+
+        .carousel-controls {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            #book {
+                width: 100%;
+                height: 100%;
+            }
+            
+            #book .page {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .right-sidebar {
+                width: 100%;
+            }
+
+            .content {
+                padding: 10px;
+            }
+
+            #book {
+                width: 100%;
+                height: 100%;
+            }
+            
+            #book .page {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="hamburger">☰</div>
+            <img src="https://orangecityalloys.com/images/indian_register_of_shipping.png" alt="WMS Logo" class="company-logo">
+        </div>
+        <div class="header-center">
+            <h1>Supplychain and Logistics E-Learning Portal</h1>
+        </div>
+        <div class="header-right">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPSucGCWBozg4SQ5vyPHHOnYGUUX-lgT1Lmw&s" alt="CEMS Logo" class="company-logo">
+            <div class="trainee-info">
+                <div class="trainee-name">Centre of Excellence in Maritime and Shipbuilding </div>
+                <div class="company-name">Competencies, Employability, Methodology & <br> Skills Creating Competencies of Industries 4.0</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+			<div class="sidebar-item" onclick="goToHome()">
+            <img src="https://cdn-icons-png.flaticon.com/512/93/93634.png" alt="Back to Home">
+            <span>Back to Home</span>
+            </div>
+             <div class="sidebar-item active" onclick="navigateTo('partners')">
+            <img src="https://cdn-icons-png.flaticon.com/512/702/702980.png" alt="WMS Training Module">
+            <span>WMS Training Module</span>
+            </div>
+		</aside>
+
+        <!-- Main Content with Flipbook -->
+        <main class="content">
+            <div class="flipbook-wrapper">
+                <div id="book">
+                    <div class="page"><img src="wmsm1.jpg" alt="Page Intro"></div>
+                    <div class="page"><img src="wms1.jpg" alt="Page 1"></div>
+                    <div class="page"><img src="wms2.jpg" alt="Page 2"></div>
+                    <div class="page"><img src="wms3.jpg" alt="Page 3"></div>
+                    <div class="page"><img src="wms4.jpg" alt="Page 4"></div>
+                    <div class="page"><img src="wms5.jpg" alt="Page 5"></div>
+                    <div class="page"><img src="wms6.jpg" alt="Page 6"></div>
+                    <div class="page"><img src="wms7.jpg" alt="Page 7"></div>
+                    <div class="page"><img src="wms8.jpg" alt="Page 8"></div>
+					<div class="page"><img src="wms9.jpg" alt="Page 9"></div>
+					<div class="page"><img src="wms10.jpg" alt="Page 10"></div>
+					<div class="page"><img src="wmsm2.jpg" alt="Page Ending"></div>
+                </div>  
+            </div>
+			<div class="controls">
+                <button id="prevBtn">← Previous</button>
+                <button id="nextBtn">Next →</button>
+            </div>
+        </main>
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <!-- Logistics Team Carousel -->
+            <div class="info-card">
+                <div class="card-header">
+                    <img src="https://thumbs.dreamstime.com/b/leader-trainer-icon-vector-sketch-well-organized-simple-use-commercial-purposes-web-printing-any-type-design-projects-241215723.jpg" alt="Trainer">
+                    <div class="card-title">Meet The Logistics & Supplychain Training and Management Team</div>
+                </div>
+                <div class="trainer-carousel">
+                    <div class="carousel-slide active">
+                        <img src="prajit.jpg" alt="Prajith Kurup"/>
+                        <div class="trainer-name">Prajit Kurup</div>
+                        <div class="trainer-role">Logistics Head-Project Manager</div>
+                        <div class="tp-code">All Govt Skill develoupment & CSR programs</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="praveen.jpg" alt="Praveen Koyyana"/>
+                        <div class="trainer-name">Praveen Koyyana</div>
+                        <div class="trainer-role">Lead Logistics Trainer</div>
+                        <div class="tp-code">SCM, Strategic Management & Student Career Councling</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="sandeep.jpg" alt="Y.K.Sandeep"/>
+                        <div class="trainer-name">Y.K.Sandeep</div>
+                        <div class="trainer-role">Logistics Trainer</div>
+                        <div class="tp-code">International Logistics & Inventory Management</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="balaji.jpg" alt="T.Balaji"/>
+                        <div class="trainer-name">T.Balaji</div>
+                        <div class="trainer-role">Logistics Trainer</div>
+                        <div class="tp-code">Warehouse Management and Skill develoupment</div>
+                    </div>
+                </div>
+                <div class="carousel-nav">
+                    <span class="nav-arrow" id="prev-arrow">◄</span>
+                    <div class="carousel-controls">
+                        <span class="dot active" data-slide="0"></span>
+                        <span class="dot" data-slide="1"></span>
+                        <span class="dot" data-slide="2"></span>
+                        <span class="dot" data-slide="3"></span>
+                    </div>
+                    <span class="nav-arrow" id="next-arrow">►</span>
+                </div>
+            </div>
+
+            <!-- Live Clock -->
+            <div class="sidebar-card">
+                <h3>Current Time</h3>
+                <div class="clock-display">
+                    <div class="clock-time" id="clockTime">00:00:00</div>
+                    <div class="clock-date" id="clockDate">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Trainee Login Information -->
+            <div class="info-card">
+                <div class="card-header">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6429/6429204.png" alt="Trainee Logo">
+                    <div class="card-title">Trainee Login Information</div>
+                </div>
+                <div class="card-content">
+                    <ul class="login-info">
+                        <li><strong>City:</strong> Visakhapatnam</li>
+                        <li><strong>State:</strong> Andhra Pradesh</li>
+                        <li><strong>Country:</strong> INDIA</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Logout Button -->
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </aside>
+    </div>
+
+    <!-- jQuery and Turn.js -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+
+    <script>
+        // Initialize Turn.js flipbook with responsive sizing
+        $(document).ready(function() {
+            function resizeBook() {
+                const wrapper = $('.flipbook-wrapper');
+                const wrapperWidth = wrapper.width();
+                const wrapperHeight = wrapper.height();
+                
+                // Maintain 1.6:1 aspect ratio (800:500)
+                const aspectRatio = 800 / 500;
+                let bookWidth, bookHeight;
+                
+                if (wrapperWidth / wrapperHeight > aspectRatio) {
+                    // Height is limiting factor
+                    bookHeight = wrapperHeight * 0.95;
+                    bookWidth = bookHeight * aspectRatio;
+                } else {
+                    // Width is limiting factor
+                    bookWidth = wrapperWidth * 0.95;
+                    bookHeight = bookWidth / aspectRatio;
+                }
+                
+                $('#book').turn({
+                    width: bookWidth,
+                    height: bookHeight,
+                    autoCenter: true,
+                    display: 'double',
+                    acceleration: true,
+                    elevation: 50,
+                    gradients: true,
+                    when: {
+                        turned: function(event, page) {
+                            updateButtons(page);
+                        }
+                    }
+                });
+            }
+            
+            resizeBook();
+
+            // Navigation buttons
+            $('#prevBtn').click(function() {
+                $('#book').turn('previous');
+            });
+
+            $('#nextBtn').click(function() {
+                $('#book').turn('next');
+            });
+
+            function updateButtons(page) {
+                const totalPages = $('#book').turn('pages');
+                $('#prevBtn').prop('disabled', page === 1);
+                $('#nextBtn').prop('disabled', page === totalPages);
+            }
+
+            updateButtons(1);
+
+            // Responsive adjustments on window resize
+            $(window).resize(function() {
+                resizeBook();
+                const page = $('#book').turn('page');
+                updateButtons(page);
+            });
+        });
+
+        // Trainer Carousel Functionality
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.dot');
+        const prevArrow = document.getElementById('prev-arrow');
+        const nextArrow = document.getElementById('next-arrow');
+        let currentSlide = 0;
+        let carouselInterval = setInterval(nextSlideAuto, 3000);
+
+        function updateCarousel(idx) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active', 'left', 'right');
+                if (i === idx) {
+                    slide.classList.add('active');
+                } else if (i < idx) {
+                    slide.classList.add('left');
+                } else {
+                    slide.classList.add('right');
+                }
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === idx);
+            });
+        }
+
+        function nextSlideAuto() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateCarousel(currentSlide);
+        }
+
+        function nextSlideManual() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateCarousel(currentSlide);
+            resetInterval();
+        }
+
+        function prevSlideManual() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateCarousel(currentSlide);
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(carouselInterval);
+            carouselInterval = setInterval(nextSlideAuto, 3000);
+        }
+
+        prevArrow.addEventListener('click', prevSlideManual);
+        nextArrow.addEventListener('click', nextSlideManual);
+
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                currentSlide = i;
+                updateCarousel(currentSlide);
+                resetInterval();
+            });
+        });
+
+        document.querySelector('.trainer-carousel').addEventListener('mouseenter', () => {
+            clearInterval(carouselInterval);
+        });
+
+        document.querySelector('.trainer-carousel').addEventListener('mouseleave', () => {
+            carouselInterval = setInterval(nextSlideAuto, 3000);
+        });
+
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-IN', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            const dateString = now.toLocaleDateString('en-IN', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('clockTime').textContent = timeString;
+            document.getElementById('clockDate').textContent = dateString;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Back to Home function
+        function goToHome() {
+            window.location.href = "wms.html";
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+      // Hamburger menu
+        document.querySelector('.hamburger').addEventListener('click', function() {
+  const leftSidebar = document.querySelector('.sidebar');
+  const rightSidebar = document.querySelector('.right-sidebar');
+  const isHidden = leftSidebar.style.display === 'none';
+  leftSidebar.style.display = isHidden ? 'block' : 'none';
+  rightSidebar.style.display = isHidden ? 'block' : 'none';
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Warehouse Management System with Flipbook loaded successfully');
+            updateClock();
+        });
+    </script>
+</body>
+</html>

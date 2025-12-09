@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #1a1d4d;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            align-items: left;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .hamburger {
+            cursor: pointer;
+            font-size: 25px;
+        }
+
+        .company-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+        }
+
+        .header-center h1 {
+            font-size: 30px;
+            font-weight: 600;
+			text-align: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .trainee-info {
+            text-align: center;
+        }
+
+        .trainee-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .company-name {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            background-color: #0f1139;
+            width: 250px;
+            color: white;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 25px;
+            cursor: pointer;
+            transition: background-color 1.3s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar-item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+            filter: brightness(0) invert(1);
+        }
+
+        .sidebar-item span {
+            font-size: 17px;
+            font-weight: 500;
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            padding: 50px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 5;
+        }
+
+        .content-header {
+            margin-bottom: 50px;
+        }
+
+        .content-title {
+            font-size: 50px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        /* Section Styles */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .dummy-article {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .dummy-article h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .dummy-article p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Partners and Courses List */
+        .list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .list-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .list-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .list-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .list-item h4 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .list-item p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        /* Right Sidebar */
+        .right-sidebar {
+            width: 300px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header img {
+            width: 60px;
+            height: 60px;
+            margin-right: 10px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #2c3e50;
+        }
+
+        .card-content {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .company-info {
+            font-weight: 500;
+            color: #1a1d4d;
+            margin-bottom: 1px;
+        }
+
+        .tp-code {
+            color: #666;
+            font-size: 9px;
+			text-align: center;
+        }
+
+        .login-info {
+            list-style: none;
+        }
+
+        .login-info li {
+            margin-bottom: 1px;
+            color: #555;
+        }
+
+        .login-info strong {
+            color: #2c3e50;
+        }
+
+        /* Live Clock */
+        .clock-display {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            color: #1a1d4d;
+            border-radius: 10px;
+        }
+
+        .clock-time {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .clock-date {
+            font-size: 14px;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Trainer Carousel Styles */
+        .trainer-carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            min-height: 190px;
+            border-radius: 10px;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            transform: translateX(100%);
+            z-index: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 10px 0;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            transform: translateX(0%);
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        .carousel-slide.left {
+            transform: translateX(-100%);
+        }
+
+        .carousel-slide.right {
+            transform: translateX(100%);
+        }
+
+        .trainer-carousel img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 3px solid #e7f9fe;
+            box-shadow: 0 3px 12px 0 rgba(30,130,200,0.15);
+        }
+
+        .trainer-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 5px 0 8px;
+            letter-spacing: 0.5px;
+            color: #1a1d4d;
+			text-align: center;
+        }
+
+        .trainer-role {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 2px;
+			text-align: center;
+        }
+
+        .carousel-controls {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding: 0 20px;
+        }
+
+        .nav-arrow {
+            cursor: pointer;
+            font-size: 20px;
+            color: #1a1d4d;
+            user-select: none;
+            transition: color 1.3s ease;
+        }
+
+        .nav-arrow:hover {
+            color: #4169E1;
+        }
+
+        .dot {
+            height: 8px;
+            width: 8px;
+            margin: 0 3px;
+            background-color: #d0e8f2;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: background 1.3s ease, transform 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: #4169E1;
+            transform: scale(1.3);
+        }
+
+        .dot:hover {
+            background-color: #5a78ff;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .tiles-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .right-sidebar {
+                width: 100%;
+            }
+            
+            .tiles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .achievement-slide {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="hamburger">☰</div>
+            <img src="https://orangecityalloys.com/images/indian_register_of_shipping.png" alt="WMS Logo" class="company-logo">
+        </div>
+        <div class="header-center">
+            <h1>Supplychain and Logistics E-Learning Portal</h1>
+        </div>
+        <div class="header-right">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPSucGCWBozg4SQ5vyPHHOnYGUUX-lgT1Lmw&s" alt="CEMS Logo" class="company-logo">
+            <div class="trainee-info">
+                <div class="trainee-name">Centre of Excellence in Maritime and Shipbuilding </div>
+                <div class="company-name">Competencies, Employability, Methodology & <br> Skills Creating Competencies of Industries 4.0</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+			<div class="sidebar-item" onclick="goToHome()">
+            <img src="https://cdn-icons-png.flaticon.com/512/93/93634.png" alt="Back to Home">
+            <span>Back to Home</span>
+            </div>
+             <div class="sidebar-item active" onclick="navigateTo('partners')">
+            <img src="https://www.pikpng.com/pngl/b/539-5398617_warehouse-clipart-inventory-management-warehouse-management-icon-png.png" alt="Warehouse Management">
+            <span>Warehouse Management</span>
+            </div>
+		</aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="content-header">
+            </div>
+            <!-- Placement Partners Section -->
+            <div id="partners" class="section active">
+                <div class="dummy-article">
+                    <h3>Learning Module</h3>
+                    <div class="list-container">
+                        <div class="list-item" onclick="window.location.href='wmsbook.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/702/702980.png" alt="Start WMS Training">
+                            <h4>Start WMS Training</h4>
+                            <p>Learn the basic details of Warehouse and Warehousing</p>
+                        </div>
+                         <div class="list-item" onclick="window.location.href='ilu.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3773/3773184.png" alt="Warehouse Layout">
+                            <h4>Warehouse Layout</h4>
+                            <p>Learn about basic shapes and Layouts of warehouse</p>
+                        </div>
+                        <div class="list-item" onclick="window.location.href='wjr.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/912/912318.png" alt="Job Roles">
+                            <h4>Job Roles</h4>
+                            <p>Learn about different job roles in warehouse</p>
+                        </div>
+                        <div class="list-item" onclick="window.location.href='wmss.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/256/1382/1382816.png" alt="Warehouse Safety">
+                            <h4>Warehouse Safety</h4>
+                            <p>Learn about rules and regulations of warehouse safety</p>
+                        </div>
+                       <div class="list-item" onclick="window.location.href='mhew.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/870/870055.png" alt="Material Handling Equipment">
+                            <h4>Material Handling Equipment</h4>
+                            <p>Learn about different material handling equipments used in warehouse</p>
+                        </div>
+						<div class="list-item" onclick="window.location.href='iocr.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/128/18303/18303477.png" alt="Warehouse Workflow">
+                            <h4>Warehouse Workflow</h4>
+                            <p>Learn about different process in warehouse</p>
+                        </div>
+						<div class="list-item" onclick="openPopup('partner7')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2271/2271441.png" alt="Storage Equipment">
+                            <h4>Storage Equipment</h4>
+                            <p>Learn about different storage equipment used in warehouse</p>
+                        </div>
+						<div class="list-item" onclick="window.location.href='whd.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/18273/18273938.png" alt="Warehouse Documents">
+                            <h4>Warehouse Documents</h4>
+                            <p>Learn about different documents used in warehouse</p>
+                        </div>
+						<div class="list-item" onclick="openPopup('partner9')">
+                            <img src="https://cdn-icons-png.flaticon.com/512/7426/7426311.png" alt="Warehouse KPI">
+                            <h4>Warehouse KPI</h4>
+                            <p>Learn about key performance indicators of warehouse</p>
+                        </div>
+						<div class="list-item" onclick="window.location.href='wmsq.html'">
+                            <img src="https://cdn-icons-png.flaticon.com/512/5694/5694744.png" alt="Warehouse Test">
+                            <h4>Start WMS Test</h4>
+                            <p>Test Your Knoledge in warehouse</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <!-- Logistics Team Carousel -->
+            <div class="info-card">
+                <div class="card-header">
+                    <img src="https://thumbs.dreamstime.com/b/leader-trainer-icon-vector-sketch-well-organized-simple-use-commercial-purposes-web-printing-any-type-design-projects-241215723.jpg" alt="Trainer">
+                    <div class="card-title">Meet The Logistics & Supplychain Training and Management Team</div>
+                </div>
+                <div class="trainer-carousel">
+               <div class="carousel-slide active">
+                        <img src="prajit.jpg" alt="Prajith Kurup"/>
+                        <div class="trainer-name">Prajit Kurup</div>
+                        <div class="trainer-role">Logistics Head-Project Manager</div>
+                        <div class="tp-code">All Govt Skill develoupment & CSR programs</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="praveen.jpg" alt="Praveen Koyyana"/>
+                        <div class="trainer-name">Praveen Koyyana</div>
+                        <div class="trainer-role">Lead Logistics Trainer</div>
+                        <div class="tp-code">SCM, Strategic Management & Student Career Councling</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="sandeep.jpg" alt="Y.K.Sandeep"/>
+                        <div class="trainer-name">Y.K.Sandeep</div>
+                        <div class="trainer-role">Logistics Trainer</div>
+                        <div class="tp-code">International Logistics & Inventory Management</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="balaji.jpg" alt="T.Balaji"/>
+                        <div class="trainer-name">T.Balaji</div>
+                        <div class="trainer-role">Logistics Trainer</div>
+                        <div class="tp-code">Warehouse Management and Skill develoupment</div>
+                    </div>
+                </div>
+                <div class="carousel-nav">
+                    <span class="nav-arrow" id="prev-arrow">◄</span>
+                    <div class="carousel-controls">
+                        <span class="dot active" data-slide="0"></span>
+                        <span class="dot" data-slide="1"></span>
+                        <span class="dot" data-slide="2"></span>
+                        <span class="dot" data-slide="3"></span>
+                    </div>
+                    <span class="nav-arrow" id="next-arrow">►</span>
+                </div>
+            </div>
+
+            <!-- Live Clock -->
+            <div class="sidebar-card">
+                <h3>Current Time</h3>
+                <div class="clock-display">
+                    <div class="clock-time" id="clockTime">00:00:00</div>
+                    <div class="clock-date" id="clockDate">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Trainee Login Information -->
+            <div class="info-card">
+                <div class="card-header">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6429/6429204.png" alt="Trainee Logo">
+                    <div class="card-title">Trainee Login Information</div>
+                </div>
+                <div class="card-content">
+                    <ul class="login-info">
+                        <li><strong>City:</strong> Visakhapatnam</li>
+                        <li><strong>State:</strong> Andhra Pradesh</li>
+                        <li><strong>Country:</strong> INDIA</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Logout Button -->
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </aside>
+    </div>
+
+    <!-- Modal -->
+    <div id="popupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <div id="popupContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Trainer Carousel Functionality
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.dot');
+        const prevArrow = document.getElementById('prev-arrow');
+        const nextArrow = document.getElementById('next-arrow');
+        let currentSlide = 0;
+        let carouselInterval = setInterval(nextSlideAuto, 3000);
+
+        function updateCarousel(idx) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active', 'left', 'right');
+                if (i === idx) {
+                    slide.classList.add('active');
+                } else if (i < idx) {
+                    slide.classList.add('left');
+                } else {
+                    slide.classList.add('right');
+                }
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === idx);
+            });
+        }
+
+        function nextSlideAuto() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateCarousel(currentSlide);
+        }
+
+        function nextSlideManual() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateCarousel(currentSlide);
+            resetInterval();
+        }
+
+        function prevSlideManual() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateCarousel(currentSlide);
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(carouselInterval);
+            carouselInterval = setInterval(nextSlideAuto, 3000);
+        }
+
+        // Manual navigation arrows
+        nextArrow.addEventListener('click', nextSlideManual);
+        prevArrow.addEventListener('click', prevSlideManual);
+
+        // Dot navigation
+        dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => {
+                currentSlide = i;
+                updateCarousel(currentSlide);
+                resetInterval();
+            });
+        });
+
+        // Pause on hover
+        document.querySelector('.trainer-carousel').addEventListener('mouseenter', () => {
+            clearInterval(carouselInterval);
+        });
+
+        document.querySelector('.trainer-carousel').addEventListener('mouseleave', () => {
+            carouselInterval = setInterval(nextSlideAuto, 3000);
+        });
+
+       // Live Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('clockTime').textContent = timeString;
+            document.getElementById('clockDate').textContent = dateString;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+		
+        // Navigation function for sidebar items
+        function navigateTo(section) {
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Show corresponding section
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(section).classList.add('active');
+
+            // For achievements, start carousel
+            if (section === 'achievements') {
+                startAchievementsCarousel();
+            }
+        }
+		
+		// Back to Home function
+		function goToHome() {
+			window.location.href = "intro.html";
+		}
+
+        // Modal Functions
+        function openPopup(type) {
+            const modal = document.getElementById('popupModal');
+            const content = document.getElementById('popupContent');
+            let popupText = '';
+
+            if (type.startsWith('partner')) {
+                const id = type.replace('partner', '');
+                popupText = `<h3>Placement Partner ${id}</h3><p>Detailed information about Placement Partner ${id}. This includes partnership details, placement statistics, and contact references. <a href="https://example.com/partner${id}" target="_blank">Visit Website</a></p>`;
+            } else if (type.startsWith('course')) {
+                const id = type.replace('course', '');
+                popupText = `<h3>Course ${id}</h3><p>Detailed syllabus for Course Classification ${id}. Includes modules, duration, and certification details. <a href="https://example.com/course${id}" target="_blank">Enroll Now</a></p>`;
+            }
+
+            content.innerHTML = popupText;
+            modal.style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popupModal').style.display = 'none';
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('popupModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Achievements Carousel
+        let achievementsCurrent = 0;
+        const achievementsTrack = document.getElementById('achievementsTrack');
+        const totalAchievementsSlides = 6; // 6 slides, show 3 at a time
+        const slidesPerView = 3;
+        const slidesToScroll = 3;
+
+        function startAchievementsCarousel() {
+            setInterval(() => {
+                achievementsCurrent += slidesToScroll;
+                if (achievementsCurrent >= totalAchievementsSlides) {
+                    achievementsCurrent = 0;
+                }
+                achievementsTrack.style.transform = `translateX(-${(achievementsCurrent / slidesPerView) * 100}%)`;
+            }, 3000);
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Hamburger menu
+        document.querySelector('.hamburger').addEventListener('click', function() {
+  const leftSidebar = document.querySelector('.sidebar');
+  const rightSidebar = document.querySelector('.right-sidebar');
+  const isHidden = leftSidebar.style.display === 'none';
+  leftSidebar.style.display = isHidden ? 'block' : 'none';
+  rightSidebar.style.display = isHidden ? 'block' : 'none';
+        });
+
+        // Tile hover effects (if tiles were present)
+        document.querySelectorAll('.tile').forEach(tile => {
+            tile.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            tile.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Sidebar active states
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function() {
+                setTimeout(() => {
+                    this.classList.remove('active');
+                }, 2000);
+            });
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Warehouse Management System loaded successfully');
+            updateClock();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
